@@ -1,0 +1,71 @@
+diff --git a/mkspecs/devices/linux-rasp-pi-g++/qmake.conf b/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
+index 6ec7817efb..64eb3952c4 100644
+--- a/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
++++ b/mkspecs/devices/linux-rasp-pi-g++/qmake.conf
+@@ -5,28 +5,46 @@
+ 
+ include(../common/linux_device_pre.conf)
+ 
+-QMAKE_RPATHLINKDIR_POST += $$[QT_SYSROOT]/opt/vc/lib
++CONFIG += static
++INSTALLS += target
+ 
+-QMAKE_LIBDIR_OPENGL_ES2 = $$[QT_SYSROOT]/opt/vc/lib
++Q_COMPILER_STATIC_ASSERT=0
++
++_QT_SYSROOT=/mnt/rasp-pi-rootfs
++
++target.path = $$_QT_SYSROOT/home/pi/
++
++INCLUDEPATH += ~/github/qtbase \
++		/home/edgar_ie/github/qtbase/src/network \
++		 $$_QT_SYSROOT/usr/include \
++		 $$_QT_SYSROOT/usr/local/qt5pi/include
++
++VC_LIBRARY_PATH = $$_QT_SYSROOT/opt/vc/lib
++VC_INCLUDE_PATH = $$_QT_SYSROOT/opt/vc/include
++VC_LINK_LINE = -L$${VC_LIBRARY_PATH}
++
++QMAKE_RPATHLINKDIR_POST += $$_QT_SYSROOT/opt/vc/lib
++
++QMAKE_LIBDIR_OPENGL_ES2 = $$_QT_SYSROOT/opt/vc/lib
+ QMAKE_LIBDIR_EGL        = $$QMAKE_LIBDIR_OPENGL_ES2
+ QMAKE_LIBDIR_OPENVG     = $$QMAKE_LIBDIR_OPENGL_ES2
+ 
+-QMAKE_INCDIR_EGL        = $$[QT_SYSROOT]/opt/vc/include \
+-                          $$[QT_SYSROOT]/opt/vc/include/interface/vcos/pthreads \
+-                          $$[QT_SYSROOT]/opt/vc/include/interface/vmcs_host/linux
++QMAKE_INCDIR_EGL        = $$_QT_SYSROOT/opt/vc/include \
++                          $$_QT_SYSROOT/opt/vc/include/interface/vcos/pthreads \
++                          $$_QT_SYSROOT/opt/vc/include/interface/vmcs_host/linux
+ QMAKE_INCDIR_OPENGL_ES2 = $${QMAKE_INCDIR_EGL}
+ QMAKE_INCDIR_OPENVG     = $${QMAKE_INCDIR_EGL}
+ 
+-QMAKE_LIBS_EGL          = -lEGL -lGLESv2
+-QMAKE_LIBS_OPENVG       = -lEGL -lOpenVG -lGLESv2
++QMAKE_LIBS_EGL          = -lbrcmEGL -lbrcmGLESv2
++QMAKE_LIBS_OPENVG       = -lbrcmEGL -lOpenVG -lbrcmGLESv2
+ 
+-QMAKE_INCDIR_BCM_HOST   = $$[QT_SYSROOT]/opt/vc/include
+-QMAKE_LIBDIR_BCM_HOST   = $$[QT_SYSROOT]/opt/vc/lib
++QMAKE_INCDIR_BCM_HOST   = $$_QT_SYSROOT/opt/vc/include
++QMAKE_LIBDIR_BCM_HOST   = $$_QT_SYSROOT/opt/vc/lib
+ QMAKE_LIBS_BCM_HOST     = -lbcm_host
+ 
+ contains(DISTRO, squeeze) {
+     #Debian Squeeze: Legacy everything
+-    QMAKE_LIBS_OPENGL_ES2   = -lGLESv2 -lEGL
++    QMAKE_LIBS_OPENGL_ES2   = -lbrcmGLESv2 -lbrcmEGL
+ } else:contains(DISTRO, arch) {
+     #On principle: no wizardry required
+ } else {
+@@ -40,7 +58,8 @@ QMAKE_CFLAGS           += \
+                           -mfpu=vfp \
+                           -mtune=arm1176jzf-s \
+                           -march=armv6zk \
+-                          -mabi=aapcs-linux
++                          -mabi=aapcs-linux \
++		          -I/home/edgar_ie/github/qtbase/src
+ 
+ QMAKE_CXXFLAGS          = $$QMAKE_CFLAGS
+ 
